@@ -1,0 +1,92 @@
+[
+ {
+  "algo": "ilp_opt",
+  "seed": 1,
+  "mean_throughput_mbps": 0.5623085176470588,
+  "mean_delay_ms": 63.362861818038546,
+  "mean_jitter_ms": 1.228625297576508,
+  "mean_loss": 0.0,
+  "sim_time_s": 0.5242156982421875
+ },
+ {
+  "algo": "dijkstra",
+  "seed": 1,
+  "mean_throughput_mbps": 0.4070460235294117,
+  "mean_delay_ms": 219.63862596271838,
+  "mean_jitter_ms": 1.6154627427798198,
+  "mean_loss": 0.2665696164972925,
+  "sim_time_s": 0.42086005210876465
+ },
+ {
+  "algo": "ilp_opt",
+  "seed": 2,
+  "mean_throughput_mbps": 0.5623085176470588,
+  "mean_delay_ms": 63.362861818038546,
+  "mean_jitter_ms": 1.228625297576508,
+  "mean_loss": 0.0,
+  "sim_time_s": 0.4978067874908447
+ },
+ {
+  "algo": "dijkstra",
+  "seed": 2,
+  "mean_throughput_mbps": 0.4070460235294117,
+  "mean_delay_ms": 219.63862596271838,
+  "mean_jitter_ms": 1.6154627427798198,
+  "mean_loss": 0.2665696164972925,
+  "sim_time_s": 0.4326903820037842
+ },
+ {
+  "algo": "ilp_opt",
+  "seed": 3,
+  "mean_throughput_mbps": 0.5623085176470588,
+  "mean_delay_ms": 63.362861818038546,
+  "mean_jitter_ms": 1.228625297576508,
+  "mean_loss": 0.0,
+  "sim_time_s": 0.4969158172607422
+ },
+ {
+  "algo": "dijkstra",
+  "seed": 3,
+  "mean_throughput_mbps": 0.4070460235294117,
+  "mean_delay_ms": 219.63862596271838,
+  "mean_jitter_ms": 1.6154627427798198,
+  "mean_loss": 0.2665696164972925,
+  "sim_time_s": 0.41996145248413086
+ },
+ {
+  "algo": "ilp_opt",
+  "seed": 4,
+  "mean_throughput_mbps": 0.5623085176470588,
+  "mean_delay_ms": 63.362861818038546,
+  "mean_jitter_ms": 1.228625297576508,
+  "mean_loss": 0.0,
+  "sim_time_s": 0.5076062679290771
+ },
+ {
+  "algo": "dijkstra",
+  "seed": 4,
+  "mean_throughput_mbps": 0.4070460235294117,
+  "mean_delay_ms": 219.63862596271838,
+  "mean_jitter_ms": 1.6154627427798198,
+  "mean_loss": 0.2665696164972925,
+  "sim_time_s": 0.4271354675292969
+ },
+ {
+  "algo": "ilp_opt",
+  "seed": 5,
+  "mean_throughput_mbps": 0.5623085176470588,
+  "mean_delay_ms": 63.362861818038546,
+  "mean_jitter_ms": 1.228625297576508,
+  "mean_loss": 0.0,
+  "sim_time_s": 0.5097370147705078
+ },
+ {
+  "algo": "dijkstra",
+  "seed": 5,
+  "mean_throughput_mbps": 0.4070460235294117,
+  "mean_delay_ms": 219.63862596271838,
+  "mean_jitter_ms": 1.6154627427798198,
+  "mean_loss": 0.2665696164972925,
+  "sim_time_s": 0.43512773513793945
+ }
+]

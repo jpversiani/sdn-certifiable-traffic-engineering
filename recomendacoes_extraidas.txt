@@ -1,0 +1,1035 @@
+pdf
+Atue como um revisor de artigos científicos. O que vc acha desse artigo, vc acha que tenho chances reais de publica-lo no IEEE??? Quais os pontos positivos e pontos negativos? Qual a sua avaliacao.
+
+Resumo: a ideia central é boa e o artigo tem qualidade acima da média para o gênero. Mas, como está, ele tem problemas de consistência interna e de desenho experimental que um revisor atento vai encontrar. Só li o texto e as figuras do PDF, sem acesso ao código ou aos resultados brutos.
+"IEEE" é uma editora, não um veículo, então a resposta depende de onde você submete. Minha estimativa é qualitativa:
+IEEE TNSM, ToN, JSAC, Communications Surveys: hoje, alta chance de rejeição. O problema é a escala de brinquedo (52 nós, 17 fluxos, links de 2 Mbps) e a novidade limitada do algoritmo. 
+IEEE Access: chance razoável após uma revisão major, desde que as inconsistências sejam corrigidas. Lembre que há taxa de publicação (APC). 
+IEEE Latin America Transactions e conferências (NOMS, NetSoft, LCN, ISCC, Latincom): boas chances, mesmo com poucas correções. 
+Honestidade metodológica. Você critica a própria função de pontuação original, discute a seção de ameaças à validade e admite que a razão de 51×/510× do testbed é artefato de bufferbloat. Isso é raro e revisores valorizam. 
+Formulação revista. Separar restrições rígidas (capacidade e atraso) de objetivo min-max é mais defensável que a função de score. 
+Ablação da augmentação do pool. Mostrar que sem ela o ACO+GA só é viável em 50% das réplicas é um resultado útil. 
+Rigor estatístico. Há 20 sementes, IC de 95% e Wilcoxon pareado. 
+Escopo prático. O mapeamento para SRv6 e a ligação com fatias 3GPP dão um enredo de aplicação. 
+Reprodutibilidade declarada. 
+Seção VIII-A: diz "optimum FO = 150" e, na mesma frase, "matching (mean 132.0)". A Fig. 2 e a Tabela III mostram 132. 
+"Hybrid stays violation-free through the whole sweep" (VIII-B, Fig. 4, resumo) contradiz a Tabela IV. Em 1,5× o ACO+GA tem 1,1±0,4 e o ACO+DE tem 1,9±0,4. Este último empata com o Q-learning (1,9±0,5), e os ICs do GA e do Q-learning se sobrepõem. 
+"Regimes certified infeasible" (conclusão) não se sustenta. Z*=0,984 (1,25×) e Z*=1,000 (1,5×) significam que existe solução viável (Z ≤ 1). Portanto o ILP-L teria zero violações, e o híbrido é subótimo ali. Você omite o ILP-L da Tabela IV, e essa omissão será notada. 
+Tempos: Tabela VI diz ILP-L 1,3 s e Q-learning 0,2 s. O texto diz 0,3 s e 1,1 s. A Tabela VI dá 6,8 s para o GA, e o texto fala em 6,4 s. 
+Detalhes menores: "p =< 0.001"; referências cruzadas trocadas (VIII-A aponta para VIII-B quando deveria apontar para VIII-C); refs [17]–[20] aparentemente não são citadas no texto; AntNet atribuído ao livro de Dorigo & Stützle em vez de Di Caro & Dorigo (1998); marcadores "XXX" no cabeçalho. 
+Ótimo trivial. O próprio artigo diz que qualquer solução viável atinge FO=132, e o CSPF já tem 132 em todas as topologias. Como o CSPF é injetado no pool, o híbrido é ≥ CSPF por construção. "Atingir o ótimo do pool em todas as réplicas" é então quase tautológico. 
+O bound Z* é em boa parte trivial. O valor 0,872 aparece idêntico em maia52 nominal, waxman52 e gridcore em todo o sweep. Ele coincide com o maior fluxo dividido pela capacidade (≈1,74/2 Mbps). Ou seja, é o limite do maior fluxo, não um limite de roteamento. O "13% de folga a 1,5×" é artefato de fluxos de fundo pequenos (0,256 Mbps) que não estressam essas topologias. Em f ≤ 1 o bound é só f·λmax/μ (confira a Fig. 5: 0,44; 0,65; 0,87). 
+O híbrido não otimiza o modelo revisado. Ele maximiza o score (1), que você mesmo chama de degenerado. No objetivo que você defende (min-max), o ILP-L vence (0,872 contra ≈1,0), resolve em ~1 s e é mais rápido que o híbrido. A pergunta inevitável é: por que usar a metaheurística? Sua resposta ("onde a escala exigir") nunca é testada. 
+Superafirmações. "Information no heuristic can produce" e "a property no heuristic can claim" são exagero. Relaxação LP e outras técnicas dão limites inferiores, e qualquer solver exato dá certificados. 
+Escala de brinquedo. 52 nós, 17 fluxos, capacidade uniforme de 2 Mbps, um único perfil de demanda. Falta pelo menos uma topologia real (Topology Zoo, SNDlib, Abilene/GÉANT com matrizes de tráfego reais) e um teste de escalabilidade em que o ILP deixe de ser tratável. Este é o ponto que decide a aceitação em periódicos mais fortes. 
+Baselines fracos: 
+O Dijkstra "euclidiano" é um espantalho; o padrão é métrica IGP, hop count ou atraso. 
+O Q-learning tabular, sequencial e treinado por cenário não representa DRL. Concluir que "learning-based routers offer no certificate / degrade off distribution" a partir dele é generalização indevida. Faltam um DRL real (PPO/GNN, como RouteNet) e a relaxação LP com arredondamento. 
+Faltam também IGP weight optimization (Fortz-Thorup), MCF, e GA/ACO sem pool para comparar. 
+Comparação assimétrica. O híbrido recebe o CSPF no pool, e o Q-learning não recebe nada equivalente. 
+Os números da Tabela V são contagens analíticas, não "medidas" em plano de dados. Sem implementação (Linux seg6, VPP, FRR), sem MTU, sem overhead de forwarding. 
+A comparação é contra o pior caso de OpenFlow (uma regra por fluxo em cada nó). Regras agregadas, rótulos MPLS ou túneis reduzem muito a vantagem. 
+Você lista todos os nós como SIDs, isto é, uma rota estrita. O SR normalmente explora prefix SIDs ao longo de caminhos IGP, com listas bem menores. Uma lista de 10 SIDs (gridcore) excede o MSD de muito hardware, e "within practical SRH budget" é discutível. Considere uSID/G-SID. 
+O resultado "2,1×" em waxman52 mostra que o ganho depende da topologia, mas o resumo destaca só o 4,1×. 
+"URLLC" com 150 ms não é URLLC no sentido 3GPP (1–10 ms, perda ~10⁻⁵). Chame de "delay-sensitive" ou use orçamentos coerentes. Não há nada de 6G no trabalho. 
+A Fig. 7 contradiz "isolamento". O atraso URLLC sobe de 52 para 142 e depois ~207 ms conforme o fundo cresce, e a perda chega a 28,4% em 2×. Isolamento real manteria o desempenho estável. Não há escalonamento por classe (todas as filas são FIFO). O que você mostra é "roteamento consciente de capacidade degrada menos que shortest path", não isolamento. 
+A base parece ser um artigo anterior seu (o "original study" com Mininet/Floodlight/D-ITG). Em periódicos IEEE é preciso declarar e demonstrar contribuição substancial nova. 
+O texto tenta cobrir ACO/GA/DE, ILP, SRv6, slicing e DRL, e cada peça fica rasa. Considere focar em um eixo, por exemplo a certificação exata com escala, ou o mapeamento SR com implementação real. 
+Referências (20) e related work são curtos, com pouca coisa recente (SDN-TE tipo B4/SWAN/SMORE, SR-TE otimizado, DRL/GNN-TE, ACO em SDN). 
+O resumo é longo demais e o tom é promocional ("auditable", "mission-critical"). 
+Falta link para o repositório (GitHub/Zenodo com DOI). 
+Corrigir todas as inconsistências numéricas e a alegação de "regime infeasible". 
+Fazer o GA/DE otimizar o objetivo revisado e incluir o ILP-L na Tabela IV. 
+Adicionar topologias reais e um experimento de escala com ILP sob limite de tempo (gap vs tempo). 
+Incluir baselines mais fortes, principalmente um DRL/GNN de verdade. 
+Rebaixar as alegações de SRv6 e slicing, ou sustentá-las com implementação e escalonamento. 
+Reescrever a novidade em relação ao trabalho anterior e enxugar o escopo. 
+Se me disser o veículo-alvo, posso calibrar a estratégia e ajudar a reescrever o resumo, a lista de contribuições e a resposta aos revisores.
+IEEE Latin America Transactions e conferências (NOMS, NetSoft, LCN, ISCC, Latincom) e SBC (revistas científicas de extrato Qualis A1 (como a IEEE Communications Magazine ou a Computer Networks)). O que vc achar mais adequada para publicacao.
+Weighing publication venues for a research paper.
+
+Eu não submeteria a versão atual ao nível A1. A melhor estratégia é dois passos: uma conferência agora e um periódico depois, com a versão estendida.
+IEEE Communications Magazine: não é adequada. Ela é uma magazine, com artigos de visão geral, tutoriais e edições temáticas, geralmente por convite ou chamada específica. Não publica trabalho experimental como este, e a nota "A1" não muda isso.
+Qualis: a CAPES vem revendo e descontinuando o Qualis como o conhecíamos, então confirme a classificação vigente do veículo no seu programa (PPGMCS) antes de decidir.
+Veículo
+Adequação hoje
+Comentário
+SBRC (SBC, principal simpósio de redes do Brasil)
+Alta
+Aceita bem trabalho aplicado e reprodutível, e o público conhece SDN. Tem trilha de indicação para periódicos SBC (JISA, JBCS) para os melhores trabalhos.
+ISCC, LCN, Latincom
+Boa
+Toleram escala pequena se o texto for bem escrito e as alegações forem moderadas.
+NetSoft, NOMS
+Média
+Exigem mais novidade e implementação real. Com o SRv6 só analítico, seria arriscado.
+IEEE LATAM Transactions
+Alta (segurança)
+Periódico IEEE com boa chance de aceitação após revisão. Menor impacto, mas cumpre requisito de publicação com prazo razoável.
+Computer Networks (Elsevier)
+Média-baixa hoje, média após ampliação
+Aceita artigos longos, e o seu já tem formato de periódico. Mas exigirá topologias reais, baseline de DRL de verdade e teste de escala.
+Caminho A: prioridade em impacto (recomendado se você tem tempo)
+Corrija as inconsistências que apontei (132 contra 150, "violation-free", "infeasible", tempos, referências).
+Envie uma versão enxuta à SBRC ou ISCC/LCN, focada em um eixo: formulação revisada + híbrido ACO+GA + certificação por ILP, sem o peso de SRv6, slicing e DRL.
+Em paralelo, construa a versão estendida: topologias reais (Topology Zoo/SNDlib), ILP com limite de tempo em instâncias maiores, DRL/GNN real, SRv6 implementado (Linux seg6 ou VPP) e GA/DE otimizando o min-max.
+Submeta a extensão a Computer Networks (ou IEEE TNSM, se os resultados ficarem fortes). Nos periódicos IEEE e Elsevier, a extensão precisa de contribuição nova substancial (em geral 30% ou mais) e de declaração clara da versão de conferência.
+Caminho B: prioridade em publicar rápido (prazo de defesa, por exemplo)Corrija o artigo e envie à IEEE LATAM Transactions. Ela dá um periódico IEEE com esforço menor. Se ainda quiser um A1, guarde o material novo (real topologies, DRL, SRv6 real) para um segundo artigo.
+Vale considerar dividir o trabalho em dois artigos, porque o atual tenta cobrir demais:
+Otimização e certificação: formulação, híbrido, ILP, bounds, baselines. É o núcleo para Computer Networks/TNSM.
+SRv6 + slicing: mapeamento com implementação e medição reais. É o núcleo para NetSoft/NOMS/SBRC.
+Dividir também evita a pergunta sobre novidade em relação ao estudo anterior, porque cada artigo tem uma contribuição mais nítida.
+Se você me disser o prazo e o requisito do seu programa (número mínimo de publicações, Qualis exigido), posso fechar a escolha e ajudar a reescrever o resumo e a lista de contribuições para o veículo escolhido.
+Já defendi o mestrado desde 2018 e já estamos em 2026. Quero publicar em uma revista boa sem precisar fazer um esforćo gigantesco.
+Levantamento de periódicos viáveis com melhorias mínimas no artigo.
+
+"Revista boa" e "sem esforço gigantesco" puxam em direções opostas. Um A1 como Computer Networks ou TNSM exigiria justamente o trabalho grande (DRL real, topologias reais, escala, SRv6 implementado). Existe, porém, um meio-termo realista: um periódico sólido de nível intermediário, com um pacote pequeno de correções.
+Veículo
+Esforço
+Comentário
+IEEE LATAM Transactions
+Baixo
+Caminho mais seguro. Impacto modesto.
+IEEE Access
+Baixo-médio
+Revisão rápida e escopo amplo. Cobra APC (confira o valor atual). Boa relação prestígio/esforço, embora alguns comitês o vejam com ressalva.
+Journal of Network and Systems Management (Springer)
+Médio
+Bom encaixe temático: gerência de rede, engenharia de tráfego e certificação exata. É a minha aposta se você quiser algo melhor que LATAM sem reescrever o trabalho.
+JISA (SBC/Springer, acesso aberto)
+Médio
+Ligado à comunidade brasileira e aceita trabalho aplicado.
+Computer Networks, TNSM, JSAC
+Alto
+Só depois de ampliar o trabalho.
+Como o Qualis mudou e os fatores de impacto variam, confirme a classificação vigente de cada veículo (Sucupira, JCR ou Scopus) antes de decidir.
+Esta é a lista de maior retorno por esforço:
+Corrigir as inconsistências numéricas: 132 contra 150, "violation-free" contra a Tabela IV, tempos do texto contra a Tabela VI, referências cruzadas e refs [17]–[20] não citadas.
+Remover ou reformular "regimes certified infeasible". Z* ≤ 1 significa que existe solução viável.
+Incluir o ILP-L na Tabela IV e na comparação. Ele vai mostrar zero violações, e é melhor você mesmo apresentar isso e justificar a metaheurística (por exemplo, escala e flexibilidade) do que deixar o revisor descobrir.
+Trocar o fitness do GA/DE para min-max (Z com penalidade de violação). É uma mudança pequena no código e resolve a maior objeção conceitual: o híbrido passa a otimizar o objetivo que você defende.
+Adicionar uma ou duas topologias reais do Topology Zoo (Abilene, GÉANT). O pipeline já existe, então é só carregar o grafo.
+Rebaixar as alegações:
+"Measured" no SRv6 vira "computed" (contagem analítica).
+"URLLC isolation" vira "delay-sensitive flows" e "degradação controlada".
+Retire "no heuristic can produce".
+Diga "tabular Q-learning" em vez de generalizar para DRL.
+Encurtar o resumo e declarar a relação com o estudo de 2018. Como o mestrado é de 2018, deixe claro o que é novo (formulação revista, ILP, SRv6, estatística). Dissertação normalmente não conta como publicação prévia, mas se algum trecho saiu em artigo de conferência, cite.
+Publicar o código no GitHub ou Zenodo, com DOI.
+Faça os itens 1 a 8 e submeta ao JNSM ou ao IEEE Access. Se vier rejeição, o material já está limpo para o LATAM ou JISA, sem retrabalho grande. Só considere Computer Networks se quiser investir num segundo ciclo, com DRL/GNN e escala.
+Se quiser, começo agora pelo item de maior impacto: reescrever o resumo e a lista de contribuições já com as alegações ajustadas. Ou, se preferir, monto a tabela IV corrigida com o ILP-L. Qual você prefere?
+
+Chatgpt:
+
+
+Sim. Há um trabalho publicável aqui e, olhando como revisor, eu diria que o artigo tem uma contribuição potencialmente interessante para uma venue IEEE. Mas eu não submeteria esta versão ainda. O problema não é falta de resultados; é que existem algumas inconsistências metodológicas importantes que um revisor provavelmente encontraria rapidamente.
+Minha avaliação geral seria:
+Potencial científico: bom/alto.Estado atual para submissão: ainda insuficiente.Depois de uma revisão forte: chances reais de publicação em um venue IEEE, especialmente um periódico de escopo amplo ou uma conferência adequada ao tema.
+Abaixo vai o parecer que eu faria.
+
+O melhor aspecto do artigo é que ele não é simplesmente "propus um ACO+GA e ele ficou melhor que Dijkstra".
+A ideia de fechar o ciclo:
+heurística → espaço de busca → solução exata → certificação → avaliação estatística → implementação/mapeamento para SRv6
+é interessante.
+O artigo explicitamente tenta fazer isso ao combinar o híbrido ACO+GA/DE com dois modelos ILP, inclusive um modelo de min-max utilization.
+Isso é bem mais interessante cientificamente do que simplesmente apresentar uma nova metaheurística.
+A parte mais forte, para mim, é:
+"qual é a qualidade da solução heurística em relação ao ótimo?"
+Em muitos artigos de metaheurística essa pergunta nunca é respondida porque o ótimo global é desconhecido.
+Aqui vocês tentam responder usando ILP.
+Esse é um ponto que eu preservaria como contribuição central.
+
+A crítica ao modelo original é potencialmente muito boa.
+Você mostra que, sob admissão completa, partes da função objetivo viram constantes e, portanto, não ajudam efetivamente a diferenciar soluções; depois substitui isso por:
+capacidade como restrição dura;
+atraso como restrição dura;
+minimização do máximo utilization.
+Isso é conceitualmente muito mais limpo.
+Especialmente esta ideia:
+min⁡Z\min Z
+com
+Z≥∑kλkxijkμijZ \geq \frac{\sum_k \lambda_k x^k_{ij}}{\mu_{ij}}
+é uma formulação clássica e defensável para balanceamento de carga.
+E o resultado de obter, por exemplo, um bound exato de 0,984 para o caso de 1,25× é interessante porque permite afirmar não apenas:
+"meu algoritmo encontrou uma solução boa",
+mas:
+"nenhuma solução possível naquele modelo consegue fazer melhor que isso."
+Esse é um argumento científico muito mais forte.
+
+Eu daria bastante destaque a isso na versão final.
+O artigo diferencia corretamente duas coisas:
+Ótimo dentro do candidate pool.
+Ótimo global do problema formulado no grafo.
+Isso é excelente conceitualmente.
+O próprio artigo reconhece essa diferença quando explica que ILP-P certifica a optimalidade do híbrido dentro do espaço gerado, enquanto ILP-L resolve o modelo revisado sobre o grafo.
+Esse ponto pode virar uma contribuição muito mais elegante se for escrito como:
+Search-space certification versus global optimality certification
+Isso é mais forte do que simplesmente "usamos ILP para comparar".
+
+Vocês têm:
+3 topologias;
+52 nós;
+17 fluxos;
+5 níveis de carga;
+20 seeds;
+diferentes algoritmos;
+IC 95%;
+Wilcoxon;
+simulação em nível de pacotes;
+estudo de SRv6;
+teste com Q-learning;
+análise de runtime.
+Isso é uma estrutura experimental bastante boa.
+E há resultados particularmente bons:
+redução de violações;
+bounds exatos;
+avaliação de utilization;
+comparação de runtime;
+redução de estado de forwarding;
+estudo de QoS.
+Isso dá ao artigo uma amplitude interessante.
+
+Achei interessante não ficar apenas na simulação.
+Vocês pegam os caminhos gerados e perguntam:
+"Como isso seria representado no data plane?"
+A comparação:
+69–70 regras OpenFlow → 17 regras SRv6 de headend
+é intuitiva e fácil de entender.
+Além disso, a tabela é clara:
+Topologia
+OpenFlow
+SRv6
+Redução
+maia52
+69
+17
+4,1×
+waxman52
+35
+17
+2,1×
+gridcore
+70
+17
+4,1×
+Isso ajuda muito a tirar o trabalho do campo puramente matemático.
+
+Aqui está o que, como revisor, provavelmente me faria recomendar major revision.
+Na seção VIII-A vocês escrevem:
+ILP-P certifica FO = 150
+mas logo depois dizem que:
+ACO+GA obtém 132.0 ± 0.0, "matching the certified optimum".
+E a própria Tabela III mostra 132 como máximo.
+Isso é uma contradição objetiva.
+Na Figura 2 também aparece 132 como linha do ótimo.
+Portanto, provavelmente 150 é um erro de edição e deveria ser 132.
+Mas não pode permanecer.
+Um revisor perceberia isso imediatamente e começaria a questionar todos os números.
+Prioridade: CRÍTICA.
+
+Este, para mim, é o maior problema conceitual do artigo.
+Vocês apresentam o novo modelo:
+hard capacity + hard delay + min-max utilization.
+Porém, quando descrevem GA/DE, dizem:
+"Both maximize (1)"
+ou seja, continuam otimizando a função original FO.
+Então existe uma desconexão:
+min⁡max⁡Uij\min \max U_{ij}
+max⁡FO\max F_O
+Essas duas coisas não são a mesma otimização.
+E isso explica inclusive alguns resultados.
+O próprio artigo reconhece:
+"without a balancing objective their utilization profiles are worse"
+Isso cria uma pergunta inevitável para o revisor:
+Afinal, qual problema o método proposto está resolvendo?
+Esse ponto precisa ser resolvido antes da submissão.
+Opção A — minha preferência científica:alterar o fitness do ACO+GA/DE para trabalhar diretamente com o modelo revisado.
+Ou:
+Opção B:assumir explicitamente que são dois modelos distintos:
+modelo histórico/original;
+modelo revisado, usado como benchmark exato.
+Mas nesse caso a contribuição precisa ser reescrita porque atualmente o texto parece sugerir que o híbrido resolve o modelo revisado.
+
+Outro problema técnico importante.
+O artigo define:
+xijk∈{0,1}x^k_{ij}\in\{0,1\}
+e mostra as restrições de capacidade e atraso.
+Mas a formulação apresentada no texto não mostra claramente as restrições de conservação de fluxo:
+∑jxijk−∑jxjik={1i=sk−1i=tk0caso contraˊrio\sum_j x_{ij}^k-\sum_j x_{ji}^k = \begin{cases} 1 & i=s_k\\ -1 & i=t_k\\ 0 & \text{caso contrário} \end{cases}
+Sem isso, matematicamente, a formulação apresentada não caracteriza completamente uma rota origem-destino.
+É claro que provavelmente isso existe no código.
+Mas um paper precisa apresentar a formulação completa.
+Um revisor de otimização provavelmente vai perguntar:
+"Where are the flow-conservation constraints?"
+Esse é outro major revision item.
+
+O artigo fala bastante de:
+learning-based routing / DRL
+mas o baseline efetivamente implementado é tabular Q-learning.
+Isso não é a mesma coisa que comparar contra um DRL moderno.
+Então eu evitaria conclusões do tipo:
+"learning-based routing não oferece garantia..."
+ou:
+"learning-based routers degradam fora da distribuição..."
+como afirmações gerais.
+O experimento demonstra algo muito mais específico:
+o Q-learning tabular utilizado neste protocolo experimental teve determinado comportamento.
+Isso é defensável.
+Mas extrapolar desse resultado para todo DRL é muito mais vulnerável.
+Esse problema fica ainda mais evidente porque trabalhos recentes em IEEE estão usando DRL diretamente para traffic engineering e SRv6; por exemplo, há trabalho de 2025 no IEEE TNSM sobre TE SRv6-aware com DRL + local search. (IEEE Xplore)
+Portanto, sua revisão bibliográfica precisa mostrar que você conhece esse estado da arte.
+
+São apenas 20 referências.
+O problema não é simplesmente quantidade.
+É que o paper fala simultaneamente de:
+SDN;
+traffic engineering;
+ACO;
+GA;
+differential evolution;
+ILP;
+Q-learning;
+DRL;
+SRv6;
+5G/6G;
+slicing;
+PCE.
+Isso é muita coisa para uma revisão de literatura tão compacta.
+Além disso, a área evoluiu bastante.
+Há trabalhos IEEE recentes sobre:
+TE distribuído com reinforcement learning;
+SRv6;
+DRL para TE;
+arquiteturas SDN/SRv6;
+otimização de deployment de SRv6.
+Por exemplo, o IEEE TNSM publicou em 2024 um trabalho sobre distributed TE em redes híbridas usando multi-agent reinforcement learning, e em 2025 publicou trabalho sobre SRv6-aware TE com DRL. (IEEE Xplore)
+Portanto, eu ampliaria significativamente a seção II.
+
+Aqui eu seria particularmente conservador.
+Vocês associam os fluxos a:
+URLLC;
+eMBB;
+mMTC.
+Isso está baseado em classes 3GPP, o que é válido como construção experimental.
+Mas chamar os fluxos de:
+"URLLC-grade"
+porque possuem 150 ms
+é uma afirmação que pode gerar questionamento.
+Eu mudaria a terminologia para algo como:
+URLLC-class / URLLC-inspired traffic profile
+ou simplesmente:
+flows mapped to the URLLC service class
+e deixaria claro que o SLA de 150 ms é uma condição experimental criada pelo trabalho, não uma definição universal de URLLC.
+
+O paper afirma que a estrutura das restrições:
+"structurally prevents one slice from congesting another"
+Eu não escreveria dessa maneira.
+A restrição de capacidade é agregada no link:
+∑kλkxijk≤μij\sum_k \lambda_k x^k_{ij}\leq\mu_{ij}
+Isso evita ultrapassagem da capacidade total, mas não significa automaticamente que exista isolamento entre slices no sentido tradicional de network slicing.
+Eu escreveria:
+logical QoS differentiation
+ou
+logical traffic isolation under shared capacity constraints
+Isso é muito mais defensável.
+
+A redução de estado é interessante, mas:
+"4.1×"
+não significa automaticamente melhor desempenho da rede.
+Você mede forwarding state, não:
+CPU;
+TCAM;
+latência de programação;
+overhead real;
+throughput;
+impacto de SRH;
+MTU fragmentation;
+impacto em hardware real.
+Portanto, eu trataria isso como:
+measured reduction in per-flow forwarding state
+e não como argumento genérico de superioridade de SRv6.
+Inclusive há literatura recente explorando explicitamente o custo do SRH no próprio problema de TE, o que mostra que esse aspecto pode ser importante na avaliação. (IEEE Xplore)
+
+Vocês mesmos reconhecem isso:
+"All instances have 52 nodes and 17 flows"
+e dizem que não é avaliação em escala de backbone.
+Isso é bom porque vocês não escondem a limitação.
+Mas eu acrescentaria pelo menos um experimento de escala:
+100 nós;
+200;
+500;
+mesmo que somente com ILP em instâncias pequenas/intermediárias e heurística nas maiores.
+Isso ajudaria muito a responder a pergunta inevitável:
+"Por que eu deveria acreditar que isso funciona além de 52 nós?"
+
+Eu gostaria de ver:
+O paper já tem parte disso, especialmente a comparação com pool sem augmentation. Isso é bom.
+Mas ainda não separa completamente:
+contribuição do ACOcontribuição do GAcontribuição da augmentationcontribuição da combinação ACO+GA.
+Isso seria uma ótima revisão.
+
+Achei muito boa a seção IX.
+Vocês reconhecem:
+escala;
+tráfego UDP;
+ausência de TCP;
+reutilização do pool;
+pesos arbitrários;
+demandas estáticas;
+falta de reotimização dinâmica.
+Isso passa uma sensação de trabalho científico sério.
+Não tentaria esconder essas limitações.
+
+Olhei também a renderização do PDF, não apenas o texto.
+A apresentação está próxima de um paper IEEE de conferência:
+duas colunas;
+figuras legíveis;
+tabelas compactas;
+captions claras;
+equações bem integradas;
+boa densidade de informação.
+A Figura 3 e a Figura 5, por exemplo, comunicam rapidamente o argumento principal.
+Visualmente, não vejo um problema que justificaria rejeição.
+O problema é científico/metodológico, não de formatação.
+
+Hoje o artigo tenta contar histórias demais ao mesmo tempo:
+ACO + GA + DE + ILP + Q-learning + DRL + SRv6 + 5G + slicing.
+Isso faz o trabalho parecer maior, mas paradoxalmente pode reduzir a percepção de contribuição.
+Eu faria o eixo central:
+e colocaria:
+Problema→ formulação
+Método→ candidate generation + evolutionary selection
+Certificação→ ILP-P + ILP-L
+Avaliação→ optimality gap + SLA + utilization
+Deployment→ SRv6 mapping
+E deixaria 5G/6G e Q-learning como estudos complementares.
+Isso deixaria o paper muito mais convincente.
+
+Aqui é importante distinguir "IEEE" de uma venue específica.
+É provavelmente uma casa bastante compatível com o escopo atual, porque aceita trabalhos originais, tecnicamente corretos, com avaliação experimental detalhada, e explicitamente cobre aplicações multidisciplinares. O próprio IEEE Access informa esses critérios e permite material suplementar, incluindo código e dados. (IEEE Access)
+Para esse destino, eu vejo potencial real depois das correções.
+O tema também encaixa muito bem: o escopo cobre gerenciamento/controle de redes, SDN e aplicação de ML à operação de redes. (IEEE Technology Navigator)
+Mas eu prepararia uma versão mais forte para esse nível, especialmente:
+formulação rigorosa;
+baselines mais fortes;
+literatura 2024–2026;
+maior escala;
+melhor comparação com trabalhos atuais de SRv6/DRL.
+A existência de trabalhos recentes nessa linha no TNSM mostra que a interseção SDN + TE + SRv6 + learning já é uma área ativa. (IEEE Xplore)
+
+Como parecerista, eu colocaria aproximadamente assim:
+Critério
+Minha avaliação
+Problema relevante
+Muito bom
+Clareza da motivação
+Muito bom
+Formulação matemática
+Boa ideia, mas incompleta na apresentação
+Novidade
+Boa/potencialmente forte
+Algoritmo
+Bom, mas precisa alinhamento com o novo objetivo
+Avaliação experimental
+Forte
+Estatística
+Boa, mas pode ser aprimorada
+Baselines
+Insuficientes para sustentar algumas conclusões
+Estado da arte
+Fraco para a ambição do paper
+SRv6
+Interessante
+5G/slicing
+Interessante, mas com claims fortes demais
+Reprodutibilidade
+Promissora
+Escrita
+Boa
+Apresentação visual
+Boa
+Pronto para submissão
+Ainda não
+Potencial após revisão
+Bom
+
+Em ordem de prioridade:
+1. Corrigir a inconsistência 150 vs. 132.
+2. Resolver a discrepância entre o novo modelo min-max e o fato de GA/DE continuarem maximizando a função antiga.
+3. Apresentar a formulação ILP completa, especialmente conservação de fluxo e todas as variáveis auxiliares.
+4. Reescrever as afirmações sobre DRL, URLLC e slice isolation para que os claims não ultrapassem os experimentos realizados.
+5. Ampliar bastante o estado da arte e incluir trabalhos recentes de SDN-TE/SRv6/DRL.
+Depois disso eu faria os experimentos de escala e ablation.
+
+Minha opinião sincera é:
+não é um paper "fraco tentando parecer forte".
+Pelo contrário. Há uma ideia científica legítima aqui, e a combinação de metaheurística + certificação exata + análise estatística + mapeamento SRv6 é uma base interessante. A parte de certificação, em particular, pode ser transformada no verdadeiro diferencial do artigo.
+O que me preocupa é que a versão atual parece ter sido montada com vários resultados bons que ainda não estão totalmente amarrados em uma única tese científica.
+E existe um risco real de um revisor ler:
+"ACO+GA otimiza uma função, ILP otimiza outra, depois usamos ILP para mostrar QoS, Q-learning é chamado de proxy de DRL, SRv6 é adicionado como outra contribuição..."
+e perguntar:
+"What exactly is the main scientific contribution?"
+Essa é a pergunta que eu resolveria primeiro.
+Eu classificaria como: Major Revision / potencialmente publicável.
+Não recomendaria abandonar o trabalho.
+Eu faria uma revisão substancial e, depois dela, consideraria perfeitamente plausível uma submissão IEEE. Para IEEE Access, o encaixe temático e de tipo de contribuição me parece particularmente razoável. (IEEE Open)
+E tem um detalhe importante: o próprio manuscrito já declara que os experimentos e scripts são reproduzíveis e que os números vêm dos arquivos de resultados gerados. Isso é um ativo muito valioso. Eu aproveitaria isso e colocaria um repositório/artefato de reprodução claramente identificável na versão de submissão.
+Se você quiser fazer isso realmente visando publicação, o próximo passo que eu faria é um "pré-review IEEE" linha por linha deste PDF: apontar exatamente cada trecho que um revisor poderia atacar e, para cada um, escrever a alteração concreta que eu faria no artigo.
+------------------
+IEEE Latin America Transactions e conferências (NOMS, NetSoft, LCN, ISCC, Latincom) e SBC (revistas científicas de extrato Qualis A1 (como a IEEE Communications Magazine ou a Computer Networks)). O que vc achar mais adequada para publicacao. Já defendi o mestrado desde 2018 e já estamos em 2026. Quero publicar em uma revista boa sem precisar fazer um esforćo gigantesco.
+
+Pensando especificamente no seu objetivo — “publicar em uma revista boa, aproveitar o máximo possível o artigo que já está pronto e não transformar isso em outro mestrado” — eu mudaria um pouco a estratégia em relação ao que eu disse antes.
+E não porque seja simplesmente “mais fácil”. É porque o seu manuscrito atual encaixa estruturalmente e tematicamente muito bem nela, com relativamente pouca cirurgia.
+A revista declara explicitamente que publica trabalhos de Computing, comunicações e computer networks, valoriza evidência experimental e exige contribuição original, clareza e correção técnica. (IEEE América Latina Transactions)
+Mais importante para você: o seu PDF atual tem 8 páginas, enquanto a IEEE Latin America Transactions aceita research papers de 6 a 9 páginas. (IEEE América Latina Transactions)
+Isso é uma coincidência muito boa.
+
+Venue
+Encaixe com seu artigo
+Trabalho adicional
+Minha leitura
+IEEE Latin America Transactions
+Muito alto
+Baixo–médio
+Minha escolha
+Computer Networks
+Muito alto
+Médio–alto
+Excelente segunda opção
+IEEE/IFIP NOMS
+Muito alto
+Médio
+Excelente opção de conferência
+IEEE NetSoft
+Alto
+Médio
+Interessante, mas exige enfatizar softwarization
+IEEE LCN
+Alto
+Médio
+Bom, mas menos específico
+IEEE LatinCom
+Médio–alto
+Médio
+Bom encaixe regional/telecom
+IEEE ISCC
+Alto
+Médio
+Mais abrangente
+IEEE Communications Magazine
+Baixo
+Muito alto
+Eu não tentaria
+Revistas SBC
+Depende da revista
+Variável
+Não seria minha primeira tentativa
+Essa não é uma avaliação de “qual revista é melhor” em termos absolutos; é qual combina melhor com o manuscrito que você efetivamente tem hoje.
+
+Há uma coisa muito importante: o seu paper parece quase feito para caber no formato da LATAM Transactions.
+Seu trabalho tem:
+SDN;
+traffic engineering;
+otimização;
+redes;
+QoS;
+inteligência computacional;
+evidência experimental;
+aplicação potencial em redes da América Latina.
+Tudo isso está dentro do escopo declarado da revista. (IEEE América Latina Transactions)
+Além disso, a revista informa que dá preferência a trabalhos com forte evidência experimental. (IEEE América Latina Transactions)
+Seu artigo tem bastante disso:
+3 topologias × 5 níveis de carga × 20 seeds, ILP exato, estatística, simulação de pacotes, Q-learning, SRv6 e análise de runtime.
+Então você não teria de inventar uma nova seção experimental gigantesca apenas para "encaixar" o artigo.
+A LATAM Transactions informa que está sempre aberta a submissões, e o research paper tem limite inicial de 6–9 páginas. (IEEE América Latina Transactions)
+Seu artigo:
+8 páginas → dentro do limite.
+Isso sozinho já reduz bastante o esforço editorial.
+
+Sim, embora eu colocaria a expectativa corretamente.
+A própria revista informa indexação em Web of Science e Scopus. (IEEE América Latina Transactions)
+Os dados bibliométricos informados pelo periódico para 2024 eram:
+Impact Factor: 1,3
+CiteScore: 4,0
+Q3 no Web of Science
+Q2 no Scopus. (IEEE América Latina Transactions)
+E há uma atualização ainda mais recente divulgada pelo próprio editor em 2026 indicando, para 2025:
+Impact Factor: 1,6
+CiteScore: 4,3
+Q3 no JCR
+Q2 no Scopus. (LinkedIn)
+Portanto, não estamos falando de uma revista obscura apenas porque é da América Latina.
+É um periódico IEEE indexado, com evolução bibliométrica recente.
+
+A própria LATAM Transactions divulgou para 2025:
+711 submissões141 artigos publicados16% de taxa de aceitaçãoprimeira decisão editorial em 6 diassubmissão até aceitação: 168 dias. (IEEE América Latina Transactions)
+Então eu não chamaria de revista fácil.
+Mas o seu objetivo não deveria ser encontrar uma revista fácil.
+Deveria ser encontrar:
+uma revista suficientemente boa para valer a publicação e suficientemente alinhada ao manuscrito para não exigir reconstruí-lo inteiro.
+E nesse critério ela é uma opção bastante racional.
+
+Eu não faria outro experimento gigantesco.
+Faria uma revisão direcionada em aproximadamente cinco frentes.
+Isso é obrigatório.
+No texto aparece:
+ILP-P = 150
+mas o restante do artigo trata 132 como ótimo.
+Isso precisa desaparecer.
+
+Atualmente o artigo apresenta o modelo revisado de min-max utilization, mas o GA/DE continua explicitamente maximizando a função original (1).
+Esse é o ponto que eu mais corrigiria.
+Você não necessariamente precisa jogar fora o algoritmo.
+Podemos simplesmente estruturar o artigo de modo muito mais rigoroso:
+Modelo A — original/scoring model
+→ usado para reproduzir e comparar com o trabalho original.
+Modelo B — revised constrained model
+→ usado para certificação, feasibility e min-max load balancing.
+ILP-P
+→ certifica o melhor resultado dentro do pool.
+ILP-L
+→ fornece o ótimo global do modelo revisado.
+Isso transforma uma aparente inconsistência em uma contribuição metodológica deliberadamente separada.
+
+Eu colocaria explicitamente as restrições de conservação de fluxo, porque elas estão implícitas no problema mas não estão apresentadas de forma suficientemente completa na formulação mostrada no artigo.
+Isso é uma revisão de rigor, não uma nova pesquisa.
+
+Principalmente:
+"learning-based routing";
+"DRL";
+"URLLC-grade";
+"slice isolation".
+Seu experimento real de aprendizagem é Q-learning tabular.
+Eu deixaria as afirmações exatamente no nível que o experimento comprova.
+Isso torna o artigo mais difícil de atacar, sem precisar realizar novos experimentos.
+
+Aqui eu faria um esforço moderado.
+O artigo atual tem referências importantes, mas vai até trabalhos de 2022 em vários pontos.
+Já existem trabalhos de 2025–2026 sobre:
+SDN traffic engineering;
+DRL para routing;
+SRv6;
+network softwarization.
+Por exemplo, Computer Networks publicou em 2025 trabalhos recentes especificamente sobre DRL para congestion avoidance em SDN e rerouting de fluxos críticos. (Colab)
+Eu atualizaria a revisão, mas sem transformar a revisão de literatura em um novo capítulo da dissertação.
+
+Essa é uma decisão relativamente fácil.
+Apesar de ser uma publicação muito conhecida, o seu paper não está no formato natural da Communications Magazine.
+A própria revista exige, para artigos regulares:
+máximo de 7 páginas;
+máximo de 5.500 palavras;
+máximo recomendado de 6 figuras/tabelas combinadas;
+máximo de 15 referências;
+forte orientação tutorial/expositiva;
+e afirma explicitamente que não publica manuscritos altamente teóricos típicos de journals, transactions e research conferences. (IEEE Communications Society)
+Seu artigo é justamente o contrário:
+formulação matemática + ILP + metaheurística + experimentação + tabelas + figuras + comparação estatística.
+Ou seja:
+não seria uma questão de simplesmente "melhorar o paper".
+Você teria que reescrever o paper para virar outra espécie de artigo.
+Isso vai contra o seu objetivo.
+
+Aqui está a opção que eu colocaria como segundo alvo.
+O encaixe temático é excelente.
+A revista declara explicitamente interesse em:
+routing;
+resource discovery;
+congestion/flow control;
+QoS;
+novos métodos e algoritmos;
+avaliação de desempenho;
+redes de computadores em geral. (Elsevier Shop)
+Além disso, existem artigos muito recentes na revista sobre exatamente áreas próximas ao seu trabalho. (Colab)
+E hoje ela tem indicadores bastante mais altos do que a LATAM Transactions, com fontes bibliométricas de 2025 reportando algo na faixa de IF 4,6–4,7 e CiteScore 8,9–9,3, dependendo da referência/ano do artigo. (Colab)
+Mas há uma diferença importante:
+Principalmente:
+mais literatura recente;
+melhor definição da novidade;
+formulação ILP mais completa;
+ablation mais cuidadoso;
+pelo menos alguma discussão/avaliação de escalabilidade;
+comparação mais cuidadosa com trabalhos modernos de DRL.
+Não acho que precise necessariamente fazer uma nova dissertação.
+Mas é claramente mais trabalho que LATAM Transactions.
+
+Aqui apareceu uma oportunidade atual.
+O NOMS 2027 será realizado de 10 a 14 de maio de 2027, em Montreal, e a submissão de artigos técnicos está marcada para 9 de novembro de 2026. (IEEE Communications Society)
+E o escopo encaixa quase perfeitamente:
+SDN;
+optimization;
+evolutionary algorithms;
+AI/ML;
+network management;
+5G/6G;
+SLA;
+performance management;
+simulation/testbed. (Mailman CELS)
+O formato também é compatível: até 8 páginas de texto principal, com páginas adicionais para referências/apêndice, até 12 páginas no total. (Mailman CELS)
+Portanto, NOMS 2027 é uma ótima alternativa de conferência para esse paper.
+E existe uma vantagem: seu paper já está muito próximo do limite de páginas necessário.
+O problema é que você teria de preparar a submissão rapidamente e adaptar a narrativa para network/service management, em vez de simplesmente enviar a versão atual.
+
+O LCN também encaixa muito bem tecnicamente.
+O CFP de 2026 incluía explicitamente pesquisa teórica e prática em networking e mencionava AI-supported networking, entre outras áreas; os regular papers tinham limite de 8 páginas mais referências/apêndices. (IEEELCN)
+Para 2027, há indicação de submissão em abril e conferência em outubro. (Aconf)
+Eu vejo LCN como uma boa opção, mas não vejo motivo para colocar LCN à frente da LATAM Transactions para seu objetivo, porque você disse explicitamente que quer uma revista.
+
+NetSoft é conceitualmente muito interessante porque a conferência é dedicada à network softwarization, SDN/NFV, network slicing, QoS, automação e AI. (IEEE Communications Society)
+Seu artigo contém exatamente vários desses elementos.
+Mas eu faria uma mudança maior de narrativa para NetSoft:
+"Hybrid optimization framework for programmable/softwarized network control"
+em vez de enfatizar tanto a metaheurística em si.
+Então eu não escolheria como primeira submissão.
+
+LatinCom também faz sentido.
+A própria IEEE ComSoc classifica LATINCOM como conferência regional da América Latina e lista entre seus tópicos SDN, network virtualization, AI/ML, 5G/6G, cloud/edge etc. (IEEE Communications Society)
+Mas novamente:
+para este manuscrito específico, eu prefiro a revista LATAM Transactions.
+
+Isso não é, por si só, um problema.
+O que importa é:
+o manuscrito submetido precisa ser original e não ter sido previamente publicado com o mesmo conteúdo.
+A própria LATAM Transactions destaca originalidade e exige que trabalhos anteriores sejam declarados/discutidos adequadamente. (IEEE América Latina Transactions)
+Portanto, o fato de sua dissertação ser de 2018 não significa que "passou da validade".
+Na verdade, eu faria algo interessante:
+não tentaria vender o artigo como “resultado de uma dissertação de 2018”.
+Eu o apresentaria como um trabalho revisitado e substancialmente ampliado/reformulado, com:
+nova formulação;
+certificação exata;
+novos experimentos;
+estatística;
+SRv6;
+Q-learning;
+análise de escalabilidade/limitações.
+Isso é muito mais forte.
+
+Seu manuscrito atual já não parece simplesmente uma publicação da sua dissertação.
+Ele incorporou uma quantidade significativa de elementos que claramente tornam o trabalho diferente da formulação original:
+revisão da função objetivo, ILP de certificação, modelos de carga, três topologias, 20 replicações, SRv6, Q-learning, packet-level simulation e análise estatística.
+Então eu não tentaria reconstruir a dissertação.
+Eu trabalharia exclusivamente no manuscrito atual.
+
+Eu faria assim:
+Primeira tentativa: IEEE Latin America Transactions.
+Não conference.
+Não Communications Magazine.
+Não tentaria imediatamente transformar o trabalho em Computer Networks.
+correção das inconsistências → formulação matemática mais rigorosa → revisão das claims → atualização bibliográfica → pequeno ajuste da narrativa → graphical abstract + video abstract.
+Isso é um trabalho de revisão, não de reconstrução.
+A LATAM Transactions inclusive exige, na submissão, manuscript + carta ao editor + graphical abstract + video abstract. (IEEE América Latina Transactions)
+Há uma taxa de US$250 somente após aceitação, segundo as informações atuais da revista. (IEEE América Latina Transactions)
+
+Caso essa tentativa não funcione, eu faria uma versão mais ambiciosa para:
+Aí sim eu acrescentaria:
+experimentos maiores;
+comparação com um baseline moderno adicional;
+ablation mais completo;
+literatura 2024–2026;
+discussão mais profunda da escalabilidade.
+
+Hoje, 28 de setembro de 2026, eu faria:
+1º alvo → IEEE Latin America Transactions
+2º alvo → Computer Networks
+Alternativa de conferência → NOMS 2027
+Alternativa adicional → LCN/NetSoft/LATINCOM
+Eu retiraria IEEE Communications Magazine da estratégia.
+E há uma razão bem pragmática para eu colocar LATAM Transactions em primeiro: seu manuscrito atual tem 8 páginas, a revista aceita research papers de 6–9 páginas, publica especificamente em computer networks, valoriza evidência experimental e está aberta permanentemente a submissões. (IEEE América Latina Transactions)
+Vale atualizar essa preocupação: a CAPES informou em janeiro de 2026 que o Qualis Periódicos deixou de ser utilizado no ciclo avaliativo 2025–2028; a lista 2021–2024 continua relevante para aquela avaliação, mas não será atualizada como mecanismo do novo ciclo. (Serviços e Informações do Brasil)
+Então, para uma publicação que você fará agora, eu olharia muito mais para indexação, impacto bibliométrico, reputação da venue e aderência ao trabalho do que para a etiqueta histórica “A1”.
+No seu caso, eu não gastaria meses tentando transformar esse paper em um artigo de Computer Networks antes de tentar a LATAM Transactions. Eu corrigiria os cinco problemas científicos que identifiquei no primeiro parecer e prepararia a submissão.
+
+Qwen:
+
+Escala da Topologia (52 nós, 17 fluxos):
+Crítica esperada: Revisores podem argumentar que 52 nós é uma escala muito pequena para justificar claims de "Traffic Engineering" em redes de backbone.
+Como mitigar: Vocês já mencionam isso na Seção IX (Threats to Validity), o que é ótimo. Reforcem que este cenário é representativo de fatias de rede (network slices), redes de campus, ou redes de borda (edge), onde o controle centralizado e a otimização exata são computacionalmente viáveis. Mencionar brevemente técnicas de escalabilidade (ex: column generation ou decomposição de Benders) como trabalho futuro também ajuda.
+Modelo de Tráfego (UDP vs. TCP):
+Crítica esperada: O uso de injeção de taxa constante (estilo UDP) ignora a dinâmica de controle de congestão do TCP, que domina a Internet real. O TCP reage a perdas e atrasos, o que poderia alterar o comportamento das filas e a fronteira de viabilidade.
+Como mitigar: Deixem claro na Seção IX que o foco é em fluxos com requisitos rígidos de QoS (como URLLC, vídeo ao vivo ou telemetria industrial), que frequentemente usam UDP ou protocolos semelhantes, e que a extensão para dinâmica TCP é um trabalho futuro.
+Baseline de Aprendizado de Máquina (Q-learning Tabular):
+Crítica esperada: Alguns revisores podem considerar o Q-learning tabular um baseline "fraco" ou desatualizado, sugerindo uma comparação com Deep Reinforcement Learning (DRL) moderno (ex: PPO, DQN com GNNs).
+Como mitigar: A defesa que vocês já fazem no texto (de que serve para isolar a estrutura estado-ação sem a complexidade de treinamento de redes profundas) é válida. Talvez valha a pena adicionar 1 ou 2 parágrafos citando trabalhos recentes de DRL em roteamento e explicando por que a certificação de restrições é inerentemente difícil para DRLs "black-box", justificando a escolha do baseline mais simples e controlável.
+Novidade da Metaheurística:
+Crítica esperada: A combinação ACO + GA/DE é um padrão memético bem conhecido.
+Como mitigar: Garantir que a introdução e a conclusão deixem cristalino que a contribuição principal não é a metaheurística em si, mas sim a reformulação do problema com restrições rígidas, a certificação exata via ILP e a avaliação integrada com SRv6. O texto já faz isso bem, mas é bom estar preparado para reforçar esse ponto na resposta aos revisores (rebuttal).
+
+Classificação Sugerida: Accept with Minor Revisions (em uma conferência) ou Major Revisions (em um periódico de alto impacto, principalmente para expandir a discussão sobre escalabilidade).
+O artigo é excelente. Ele fecha um ciclo metodológico que muitos trabalhos de heurística ignoram: ele não apenas propõe uma solução, mas prova matematicamente quão boa ela é, valida-a estatisticamente, testa-a em um simulador de pacotes e mede seu impacto no plano de dados real (SRv6). A escrita é clara, a estrutura é lógica e as limitações são honestamente declaradas.
+Repositório de Código: Se ainda não o fez, coloque os scripts em um repositório anônimo (ex: GitHub anônimo ou Zenodo) para atender às políticas de Artifacts Evaluation do IEEE, que agora são fortemente incentivadas e podem acelerar a aceitação.
+Formatação: Garanta que o artigo esteja estritamente no formato IEEE de duas colunas, com todas as referências atualizadas (incluindo RFCs mais recentes do SRv6 e trabalhos de 2023-2024 sobre DRL em SDN, para mostrar que o estado da arte foi revisado até o presente).
+Cover Letter: Na carta ao editor, destaque explicitamente os 3 pilares: (1) Certificação exata de otimalidade, (2) Redução mensurável de estado via SRv6, e (3) Isolamento de fatias URLLC comprovado. Isso ajuda o editor a alocar o artigo para os revisores certos.
+
+
+Deep Seek: 
+Como revisor, minha avaliação geral é: o artigo é tecnicamente sólido, bem estruturado e com boa metodologia empírica, mas a novidade algorítmica é moderada e há inconsistências importantes que precisam ser corrigidas antes de uma submissão séria ao IEEE. Ele tem chance real em conferências IEEE de médio porte (ex.: NetSoft, NOMS, NFV-SDN, talvez ICC/GLOBECOM com ressalvas), mas dificilmente passaria hoje em transações IEEE de topo (TNSM, ToN, JSAC) sem uma revisão majoritária e expansão substancial.
+Formulação revisada bem motivada. A crítica ao modelo de scoring original — termos constantes, mistura de cardinalidades, saturação — é pertinente. A reformulação com restrições duras de capacidade e atraso + objetivo min-max de utilização é mais limpa e operacionalmente relevante.
+Certificação exata via ILP. Esse é o principal diferencial. Usar ILP-P para certificar o ótimo do pool e ILP-L para certificar limites inferiores de bottleneck é algo que muitos artigos de metaheurística em TE não fazem. Isso agrega auditabilidade.
+Avaliação estatística decente. 20 seeds, IC95%, Wilcoxon, três topologias, cinco cargas. Para conferência, está acima da média.
+Mapeamento SRv6 e medição de estado. A quantificação da redução de regras OpenFlow para SRv6 (2–4×) é útil e bem alinhada com a literatura de data plane programável.
+Baseline de Q-learning e discussão sobre DRL. A tentativa de comparar com aprendizado é louvável, ainda que o baseline seja fraco.
+Reprodutibilidade. Scripts com sementes fixas, resultados injetados, preocupação com validade — ponto muito positivo.
+Novidade algorítmica baixa. ACO + GA/DE para roteamento QoS em SDN não é novo. A contribuição real está na certificação exata e no mapeamento SRv6, não no metaheurístico em si. O artigo precisa se posicionar como “framework de TE auditável com certificação exata”, e não como “novo algoritmo híbrido”.
+Incoerência metodológica central. O estágio 2 (GA/DE) maximiza a função objetivo original (1), mas a narrativa principal é sobre o modelo revisado com restrições duras e min-max. Ou seja, o otimizador não otimiza diretamente o objetivo que o artigo diz ser o relevante. Isso enfraquece as conclusões sobre balanceamento e viabilidade.
+Escala pequena e tráfego irreal. 52 nós, 17 fluxos, links de 2 Mbps, injeção constante UDP. Para 5G/6G, URLLC, eMBB, mMTC, isso é pouco representativo. Faltam topologias reais (Abilene, GEANT, Topology Zoo) e tráfego TCP/bursty.
+Baseline de aprendizado fraco. Q-learning tabular não é DRL moderno. A crítica a DRL fica enfraquecida. Para sustentar a comparação, seria necessário incluir DQN, PPO, SAC ou resultados publicados de TE com DRL.
+Claim de URLLC problemático. Na Fig. 7, o roteamento otimizado ainda apresenta perda de ~25–28% em 2× background. Isso não é URLLC. URLLC exige confiabilidade 99,999% e perda quase nula. Jitter de ~38 ms também é alto. Ou renomeie para “fluxos de baixa latência” ou ajuste a simulação para perda < 1e-5.
+Inconsistências numéricas e textuais.
+Texto diz “ILP-P certifica FO = 150”, mas Tabela III e Fig. 2 mostram 132.
+Texto diz “ILP-L em 0,3 s”, Tabela VI diz 1,3 s.
+Texto diz Q-learning 1,1 s, Tabela VI diz 0,2 s.
+Texto diz ACO+GA 6,4 s, Tabela VI diz 6,8 s.
+“headlines” em vez de “headends”.
+Tabela I mal formatada no PDF. Isso passa impressão de falta de revisão final.
+Exatidão parcial. ILP-P certifica o ótimo do pool, não o ótimo global para a função original. O artigo às vezes soa como se fosse ótimo global. É preciso deixar claro.
+SRv6 superficial. O mapeamento é direto; falta discutir escalabilidade do SID list, MTU, hardware, segurança, e comparação com outras alternativas (P4, segment routing MPLS).
+Pool não adaptativo. O pool é gerado em carga nominal e reutilizado. Em cargas altas, o pool pode não conter solução viável, mesmo que o ILP global encontre uma. Isso limita a conclusão “o híbrido mantém SLA sempre que o pool permite”.
+Reposicionar a contribuição: “certificação exata + SRv6 + avaliação estatística” como núcleo, não o ACO+GA.
+Fazer o estágio 2 otimizar o modelo revisado (min-max + restrições duras) ou explicar claramente por que mantém a função original.
+Incluir DRL moderno ou remover a crítica forte a DRL.
+Expandir topologias e tráfego: pelo menos GEANT/Abilene, tráfego TCP, cargas realistas.
+Corrigir todas as inconsistências numéricas e typos.
+Ajustar claims de URLLC: ou simular perda < 1e-5, ou renomear.
+Adicionar análise de complexidade e escalabilidade do ILP e do metaheurístico.
+Discutir melhor SRv6: overhead, MTU, SID list longa, suporte de hardware.
+Conferência IEEE de médio porte (NetSoft, NOMS, NFV-SDN): chance razoável após correções. Algo como 50–65%.
+Conferência IEEE de topo (ICC, GLOBECOM): possível, mas precisa reforçar novidade e comparações. Algo como 30–45%.
+Revista IEEE de topo (TNSM, ToN, JSAC): no estado atual, baixa. Algo como 10–20%. Exigiria revisão major, mais escala, DRL moderno e tráfego realista.
+IEEE Access: possível após correções, mas precisa justificar bem a novidade.
+IEEE Networking Letters: talvez, se encurtar e focar na certificação exata + SRv6.
+Para conferência IEEE: Aceito com revisões majoritárias.Para transações IEEE: Rejeitado no estado atual; potencial para revisão major após expansão.
+O artigo é competente, bem escrito em estrutura e com boa reprodutibilidade. Não é um artigo ruim. Mas, do jeito que está, ele vende uma novidade algorítmica que não é tão nova e esconde a verdadeira contribuição — a certificação exata e a auditabilidade. Se você corrigir as inconsistências, alinhar o otimizador ao modelo revisado e melhorar os baselines, as chances sobem bastante.
+----------------------
+IEEE Latin America Transactions e conferências (NOMS, NetSoft, LCN, ISCC, Latincom) e SBC (revistas científicas de extrato Qualis A1 (como a IEEE Communications Magazine ou a Computer Networks)). O que vc achar mais adequada para publicacao. Já defendi o mestrado desde 2018 e já estamos em 2026. Quero publicar em uma revista boa sem precisar fazer um esforćo gigantesco.
+Considerando o seu objetivo — publicar em um veículo bom sem um esforço desproporcional, e levando em conta o estado atual do artigo (que tem contribuições reais, mas também limitações que exigiriam revisões substanciais para revistas de topo) —, a recomendação mais realista e estratégica é:
+Publicar primeiro em uma conferência IEEE de boa qualidade (NOMS ou NetSoft) e, em seguida, estender o artigo para a IEEE Latin America Transactions.
+Essa estratégia permite validar a pesquisa com revisores experientes, corrigir as inconsistências apontadas e construir um histórico de citações antes de submeter a uma revista. Vamos analisar cada opção em detalhe.
+
+Veículo
+Qualis (aprox.)
+Taxa de aceitação
+Tempo de revisão
+Adequação ao tema
+Esforço necessário
+IEEE Latin America Transactions
+B4 em Biotecnologia; em Engenharia IV costuma ser A3/A4
+16%
+6 dias (1ª decisão); 168 dias até aceitação
+Boa: publica TE, SDN, otimização
+Moderado
+Computer Networks (Elsevier)
+A1
+Não divulgada; historicamente seletiva
+~5 meses
+Excelente: é o veículo natural para TE em SDN
+Alto
+IEEE Communications Magazine
+A1
+~20%
+3–6 semanas
+Ruim: exige artigos de tutorial/revisão, não pesquisa original
+Muito alto (e baixa probabilidade)
+NOMS (IEEE/IFIP)
+A2/B1 em Engenharia IV
+~25%
+3–4 meses (conferência)
+Excelente: TE, SDN, gerência de redes
+Moderado
+NetSoft (IEEE)
+A2/B1
+~25–30%
+2–3 meses
+Excelente: softwarização, SDN, TE
+Moderado
+LCN (IEEE)
+B2
+~46%
+3–4 meses
+Boa, mas menos prestígio
+Baixo
+ISCC (IEEE)
+B2
+~46%
+3–4 meses
+Boa
+Baixo
+LATINCOM (IEEE)
+B4
+Não divulgada (provavelmente alta)
+Rápido
+Boa
+Muito baixo
+
+
+Prós:
+É uma revista indexada no Web of Science e Scopus, com fator de impacto em torno de 1,3–1,6.
+A taxa de aceitação de 16% mostra que é seletiva, mas não brutal.
+O tempo até a primeira decisão é de apenas 6 dias, o que é excelente.
+O escopo inclui computação, engenharia elétrica e telecomunicações, e o artigo se encaixa bem.
+Contras:
+O Qualis em Engenharia IV não é A1; historicamente tem sido B4 ou B3 em algumas áreas, embora possa variar. Isso pode não atender a exigências de programas de pós-graduação que pedem A1.
+A taxa de aceitação de 16% significa que não é uma publicação fácil; exige um artigo bem polido.
+Adequação ao seu caso: É a melhor relação esforço-recompensa entre as revistas. O esforço de revisão seria moderado (corrigir inconsistências, melhorar a clareza), e a chance de aceitação é razoável se o artigo for bem apresentado.
+
+Prós:
+É Qualis A1 e uma das revistas mais respeitadas na área de redes.
+O escopo é perfeito: TE, roteamento, SDN, otimização.
+Contras:
+O tempo de revisão é de cerca de 5 meses, e o processo pode se estender por múltiplas rodadas.
+A taxa de aceitação não é divulgada, mas a seletividade é alta.
+Para ser competitivo, o artigo precisaria de expansão substancial: mais topologias (GEANT, Abilene), tráfego TCP realista, comparação com DRL moderno, e correção de todas as inconsistências numéricas que apontei.
+Adequação ao seu caso: Se você tem tempo e disposição para investir 6–12 meses de revisões, vale a pena. Caso contrário, não é a opção mais eficiente.
+
+Prós: Qualis A1, altíssimo impacto.
+Contras:
+A revista publica artigos de tutorial, surveys e visões gerais, não artigos de pesquisa original com metodologia experimental extensa como o seu.
+A taxa de aceitação é de ~20%, mas a rejeição para artigos que não se encaixam no formato é quase imediata.
+O esforço para transformar seu artigo em um “magazine paper” seria enorme e provavelmente frustrante.
+Adequação ao seu caso: Não submeta. Você perderia tempo.
+
+Prós:
+NOMS e NetSoft são conferências de primeira linha na área de gerência de redes e softwarização, com Qualis A2/B1.
+O tema do seu artigo (TE em SDN, QoS, SRv6) é perfeitamente adequado.
+A taxa de aceitação é de ~25%, o que é desafiador, mas viável.
+O processo é mais rápido: submissão, revisão (2–3 meses) e apresentação.
+Publicar em conferência conta pontos no Qualis (A2/B1) e permite que você receba feedback valioso para depois estender para uma revista.
+Contras:
+O artigo precisa ser condensado para o formato de conferência (geralmente 8–10 páginas).
+Você precisará apresentar o trabalho presencialmente (ou virtualmente).
+Adequação ao seu caso: Altamente recomendado. É o melhor caminho para obter uma publicação de qualidade com esforço gerenciável e, ao mesmo tempo, preparar o terreno para uma revista futura.
+
+Se o seu objetivo é apenas publicar, sem grandes ambições de Qualis, o LCN ou o ISCC são opções com taxas de aceitação em torno de 46%, o que significa que o artigo tem boas chances se estiver bem escrito. O LATINCOM é ainda mais fácil, mas o Qualis B4 pode não ser atrativo.
+Adequação: Use apenas como plano B ou se precisar de uma publicação rápida para cumprir prazo.
+
+Dado que você defendeu o mestrado em 2018 e quer publicar sem um esforço gigantesco, a estratégia mais eficiente é:
+Passo 1: Submeta para o NOMS ou NetSoft (o que tiver prazo mais próximo).
+Adapte o artigo para o formato de conferência, focando na contribuição principal: a certificação exata via ILP e o mapeamento SRv6.
+Corrija as inconsistências numéricas (FO = 132 vs. 150, tempos de execução, etc.) e os typos (“headlines” → “headends”).
+Ajuste o claim de URLLC para “baixa latência” ou melhore a simulação para atingir perda < 1e-5.
+Com a aceitação na conferência, você terá um artigo publicado em um veículo A2/B1, com feedback valioso.
+Passo 2: Estenda o artigo para a IEEE Latin America Transactions.
+Incorpore os comentários dos revisores da conferência.
+Expanda a avaliação com uma ou duas topologias adicionais (ex.: GEANT, Abilene) para reforçar a generalidade.
+Adicione uma comparação com um baseline de DRL mais moderno (ex.: DQN) ou, se não for possível, suavize a crítica a DRL.
+Submeta à IEEE Latin America Transactions. Com a versão estendida e corrigida, a chance de aceitação é boa, e o esforço será moderado.
+Alternativa: Se você precisa de um Qualis A1 e está disposto a investir mais tempo, vá direto para Computer Networks. Mas esteja ciente de que o caminho será mais longo e exigirá expansões significativas.
+
+Em resumo: NOMS/NetSoft primeiro, IEEE Latin America Transactions depois. É o caminho que melhor equilibra qualidade, esforço e tempo para o seu caso.
+
+-----------
+
+Grok:
+
+Avaliação como revisor científico
+Sim, o artigo tem chances reais de publicação em um periódico IEEE de bom nível (ex.: IEEE Access, IEEE Transactions on Network and Service Management, IEEE Communications Letters, ou até Computer Networks / IEEE Trans. on Networking em versão mais polida). Não é “top-tier automático” (INFOCOM/NSDI/SIGCOMM ou ToN puro), mas está bem acima da média de submissões em TE/SDN heurístico e tem elementos que os revisores IEEE valorizam atualmente: certificação exata, avaliação estatística séria, mapeamento SRv6 medido e comparação controlada com baseline de aprendizado.
+Contribuição metodológica clara e bem posicionadaA reforma do modelo (passagem de scoring function degenerada para constraints hard de capacidade/atraso + objetivo min-max utilization) é bem motivada e resolve um problema real de muitos papers heurísticos de TE. O fechamento do loop com ILP-P (ótimo do pool) + ILP-L (lower bound de bottleneck) é o ponto mais forte do artigo. Poucos trabalhos de metaheurística em SDN-TE fazem isso.
+Certificação exata + avaliação estatística20 seeds, intervalos de confiança de 95%, Wilcoxon signed-rank, três topologias (incluindo duas sintéticas), cinco fatores de carga. Isso eleva o paper acima da grande maioria dos trabalhos de ACO/GA/DE em redes. O fato de o híbrido atingir o ótimo do pool em todas as réplicas é um resultado sólido.
+Resultados operacionais concretos
+Lower bounds de bottleneck (ex.: Z* = 0.984 em 1.25× no maia52) são informações que nenhum heurístico sozinho consegue produzir.
+Isolamento lógico de URLLC sob amplificação de background (até 2×) sem particionamento físico.
+Redução de estado SRv6 medida (4.1× no maia52 e gridcore) com overhead de SRH quantificado.Esses três pontos são “vendáveis” para revisores de IEEE.
+Baseline de aprendizado controladoImplementar e avaliar um agente tabular Q-learning sob o mesmo protocolo (em vez de só citar DRL papers) é honesto e útil. Mostra claramente onde o aprendizado perde a garantia de factibilidade.
+ReprodutibilidadeScripts com seeds fixos e declaração de que todos os números vêm dos arquivos gerados. Isso conta pontos positivos hoje.
+Escala limitada (ameaça principal)52 nós e 17 fluxos. Para ToN / TNSM mais seletivos isso é fraco. Os autores reconhecem no threats, mas precisam fortalecer o argumento de que a certificação exata já é valiosa nesse regime e que a metodologia escala via decomposição/column generation.
+Modelo de tráfego simplificadoInjeção constante (UDP-like). A ausência de TCP/congestion control e de dinâmica de chegada/partida de fluxos é uma limitação clássica. O paper já admite, mas um revisor rigoroso vai cobrar pelo menos uma discussão mais profunda ou um experimento complementar.
+Pool estático + reusoO pool é gerado no load nominal e reutilizado. Embora justificado, isso pode ser atacado (“e se o pool adaptativo mudasse a fronteira?”). A augmentation com CSPF ajuda, mas não elimina completamente a crítica.
+Scoring function original ainda presenteMesmo com o modelo revisado sendo o foco, a manutenção da função de scoring antiga (com pesos arbitrários) gera um pouco de ruído. Alguns revisores vão perguntar por que não abandonaram completamente o FO original.
+Comparação com DRL “de verdade”O baseline tabular é honesto, mas um revisor de área de ML-for-networks pode dizer que Q-learning tabular não representa o estado da arte (Graph Neural Networks + DRL, multi-agent, etc.). O paper se defende bem ao dizer que o ponto é a falta de certificado de constraint, mas ainda assim é um alvo possível.
+Escrita e apresentaçãoO texto está tecnicamente correto e bem estruturado, mas ainda tem um pouco de “densidade de formulação” e algumas frases longas. Uma passagem de polishing (especialmente abstract e introduction) melhoraria a chance em journals de maior impacto.
+Força científica: 7.5–8.0 / 10
+Originalidade metodológica: alta (certificação + reformulação + SRv6 medido)
+Rigor experimental: bom (acima da média da área de metaheurísticas em SDN)
+Relevância prática: boa (SRv6 + slice isolation)
+Chances reais:
+IEEE Access / IEEE Communications Letters / Computer Networks → alta (provavelmente accept com minor/major revision).
+IEEE TNSM / IEEE Trans. on Networking → moderada a boa se reforçarem a discussão de escala e ameaças, e se o writing ficar mais afiado.
+Conferências top (INFOCOM etc.) → mais difícil sem topologias maiores ou experimentos com tráfego dinâmico/TCP.
+Mover a discussão de escala e de TCP para o corpo principal (não só threats).
+Adicionar (se possível) um experimento com topologia um pouco maior (ex. 100–150 nós) mesmo que só com o híbrido + CSPF + Dijkstra.
+Enfatizar ainda mais no abstract e introdução o valor da certificação de lower bound (isso diferencia o paper).
+Deixar explícito que o Q-learning é um proxy controlado e que o argumento principal é “constraint certificate vs. black-box learning”.
+Revisar a escrita do abstract para ficar mais “punchy” (já está bom, mas pode ficar melhor).
+Resumo do revisor:O artigo é sólido, honesto metodologicamente e tem resultados que merecem publicação. Não é revolucionário, mas é melhor que a maioria dos papers de ACO/GA em TE que circulam. Com um polishing final e reforço da discussão de limitações, as chances em um bom journal IEEE são reais e bastante favoráveis.
+Se quiser, posso detalhar comentários ponto-a-ponto no estilo de review formal (major/minor comments) ou sugerir melhorias concretas no abstract/introduction.
+----------------
+
+Queria publicar talvez na IEEE Latin America Transactions e conferências (NOMS, NetSoft, LCN, ISCC, Latincom) e SBC (revistas científicas de extrato Qualis A1 (como a IEEE Communications Magazine ou a Computer Networks)). O que vc achar mais adequada para publicacao. Já defendi o mestrado desde 2018 e já estamos em 2026. Quero publicar em uma revista boa sem precisar fazer um esforćo gigantesco.
+
+---------------------
+o que polishar no paper antes de submeter?
+
+O que polishar no paper antes de submeter(Foco em IEEE Latin America Transactions – esforço moderado, máximo impacto)o que polishar no paper antes de submeter
+Aqui está uma lista prioritária e prática. Não precisa reescrever o artigo. Foque no que realmente muda a percepção dos revisores.
+O abstract atual está correto tecnicamente, mas é denso e um pouco “list-like”.
+O que melhorar:
+Abrir com o problema de forma mais direta e impactante.
+Destacar claramente as 3 contribuições que mais vendem:
+Reformulação com constraints hard + min-max utilization
+Certificação exata (ILP) + lower bounds de bottleneck
+Redução de estado SRv6 medida + isolamento de fatias URLLC
+Reduzir um pouco o número de detalhes numéricos no abstract (deixar os números mais fortes no corpo).
+Fechar com uma frase de posicionamento: “deterministic, constraint-explicit metaheuristics with exact certification as a practical TE core for SDN controllers”.
+Meta: abstract de ~180–200 palavras, mais fluido e persuasivo.
+A introdução está boa, mas pode ficar mais “vendável”.
+Ajustes recomendados:
+No início, enfatizar o trade-off real: crescimento de tráfego vs. custo de capacidade.
+Destacar explicitamente o gap metodológico que o paper fecha:“Most heuristic SDN-TE papers lack exact certification of optimality gap and bottleneck lower bounds.”
+Tornar as 6 contribuições numeradas um pouco mais curtas e impactantes.
+Adicionar 1–2 frases sobre relevância para operadores (especialmente em contextos de América Latina / redes com recursos limitados), já que a IEEE Latin America Transactions valoriza isso.
+Você já tem a seção IX. Deixe-a mais proativa e honesta (revisores gostam disso).
+Adicione/fortaleça:
+Escala (52 nós): reconheça e diga que a certificação exata já é valiosa nesse regime e que a metodologia escala via decomposição.
+Tráfego estático / UDP-like: mencione que TCP dinâmico é trabalho futuro, mas que o isolamento de fatias já foi demonstrado sob amplificação de background.
+Idade do trabalho: se sentir necessário, uma frase discreta dizendo que os resultados de certificação e o mapeamento SRv6 permanecem relevantes.
+Nos resultados, deixe mais evidentes (em negrito ou em frases de abertura de parágrafo) os números que mais impressionam:
+Lower bound certificado: em 1.25× load no maia52, nenhuma roteamento consegue manter todos os links abaixo de 98,4%.
+Híbrido fica com zero violações de SLA enquanto Dijkstra chega a 6–9.
+SRv6: redução de 4.1× no estado de encaminhamento.
+URLLC mantém o budget de 150 ms até 2× de background (enquanto shortest-path viola em todos os níveis).
+Esses quatro pontos são o “gancho” do paper.
+Algumas frases estão longas demais (especialmente nas seções de formulação e resultados). Quebre as mais densas.
+Padronize a nomenclatura: use sempre “pool-augmented hybrid”, “exact bottleneck lower bound”, “SLA violations”.
+Verifique se todas as tabelas e figuras estão referenciadas de forma fluida no texto.
+Abstract + Introduction + Conclusion devem “conversar” entre si (mesma mensagem central).
+A conclusão atual é boa, mas pode ser um pouco mais assertiva.
+Sugestão de reforço:
+Reafirmar que o paper fecha o loop entre heurísticas e exactness.
+Terminar com a frase de posicionamento (deterministic + certifiable TE core).
+Adicionar 1–2 referências mais recentes (2023–2025) de TE com SRv6 ou DRL em SDN (só para mostrar que você está atualizado).
+Na cover letter: mencionar explicitamente relevância para redes da América Latina e contribuição metodológica (certificação).
+
+Abstract + Introduction (1–2 dias)
+Reforçar Limitations e destacar os 4 resultados-chave (1 dia)
+Revisão de clareza de frases longas + consistência de nomenclatura (1 dia)
+Conclusão + cover letter
+Com isso o paper fica bem mais competitivo para a IEEE Latin America Transactions sem exigir experimentos novos.
+Quer que eu faça uma versão reescrita do Abstract (pronta para você copiar/adaptar) ou da parte inicial da Introduction? Posso fazer isso agora.
+-------------------
+
+Sim
+
+Segue a versão polida e pronta para uso.
+The continuous growth of Internet traffic turns capacity expansion into a recurring capital expense and motivates traffic engineering (TE) as a software-based alternative. Software-Defined Networking (SDN) exposes the routing layer to programmatic control, enabling QoS-aware path computation. This paper formulates the simultaneous routing of heterogeneous application flows as a constrained combinatorial optimization problem and solves it with a two-stage hybrid approach: an Ant Colony Optimization stage (AntNet) builds a pool of loop-free candidate routes, while a Genetic Algorithm (ACO+GA) or Differential Evolution (ACO+DE) selects the final route set.
+Beyond the original scoring function, we introduce a revised formulation in which capacity and end-to-end delay are treated as hard constraints and load balancing is expressed as an explicit min–max link utilization objective. The revised model is solved exactly as a binary multi-commodity flow integer linear program (ILP). On a 52-node network and two synthetic 52-node topologies, across five load factors and twenty randomized replications, the exact ILP certifies that the pool-augmented hybrid attains the optimum of its search space in every replication. More importantly, it computes exact bottleneck lower bounds, proving, for example, that at 1.25× load on the sparse instance no routing can keep every link below 98.4% utilization, while shortest-path routing reaches 2.10× capacity and incurs 6.0 SLA violations against zero for the hybrid.
+Packet-level simulation shows that the optimized network sustains URLLC-grade flows within a 150 ms delay budget up to 2× background amplification, whereas shortest-path routing violates the same budget at every tested load. A measured data-plane study further demonstrates that mapping the optimized paths to SRv6 segment lists reduces forwarding state by up to 4.1× (from 69 per-flow OpenFlow rules to 17 headend rules). The results position deterministic, constraint-explicit metaheuristics—with exact certification—as a practical and auditable traffic-engineering core for SDN controllers, and clearly delimit when they are preferable to learning-based routing.
+
+Operators face a structural tension: traffic grows faster than revenue, and capacity expansion remains a recurring capital expense. Traffic engineering (TE) addresses this tension from the software side by routing existing traffic more intelligently rather than adding new links. Software-Defined Networking (SDN) provides the missing control point: by decoupling the control plane and exposing programmable forwarding, an SDN controller can compute and install paths that satisfy per-application QoS requirements instead of simply replicating shortest-path behavior.
+This paper studies exactly that problem. Given a topology with per-link capacity and delay, and a set of concurrent applications with minimum bandwidth, maximum delay and priority requirements, the goal is to compute a route for every application that maximizes admission quality under QoS constraints. We make the following contributions, each responding to a concrete methodological gap in the heuristic SDN-TE literature:
+Revised formulation. We analyze the scoring-function model commonly used in heuristic SDN-TE, identify its degeneracies, and reformulate the problem with hard capacity and delay constraints together with an explicit min–max utilization balancing objective.
+Exact certification. We solve the revised model exactly as a binary multi-commodity flow ILP and the scoring model exactly over the candidate pool. The exact solutions certify that the pool-augmented hybrid attains the pool optimum in every replication and, more importantly, compute exact bottleneck lower bounds—proofs of the minimum achievable maximum link utilization.
+Statistical evaluation at scale. We evaluate six routing methods on three topologies across five load factors and twenty randomized replications, with 95% confidence intervals and Wilcoxon signed-rank tests.
+Measured SRv6 state reduction. We map the optimized paths to SRv6 segment lists and quantify the resulting data-plane state reduction relative to per-flow OpenFlow programming.
+Slice isolation evidence. We connect the demand profile to 3GPP service classes and measure, in packet-level simulation, the stability of URLLC-grade flows under growing background load.
+Learning-based baseline. We implement a tabular Q-learning routing agent under the same experimental protocol, grounding the comparison with learning-based approaches in measured numbers rather than assertions.
+
+O Abstract ficou mais fluido, com a mensagem central (certificação + lower bounds + SRv6 + isolamento) bem destacada.
+A Introduction abre de forma mais direta e posiciona claramente o gap que o paper fecha.
+Mantive o conteúdo técnico fiel ao original; apenas melhorei clareza, ritmo e impacto.
+Quer que eu também reescreva a Conclusão no mesmo estilo, ou prefere que eu ajuste alguma frase específica do Abstract/Introduction?
+
+
+Rewrite the Conclusion section in the same style
+
+Conclusion (versão reescrita – mesmo estilo)
+We reformulated QoS-aware traffic engineering for SDN by replacing a degenerate scoring function with hard capacity and delay constraints and an explicit min–max link-utilization objective. We then closed the methodological loop between heuristics and exactness: a two-stage hybrid (ACO candidate-pool generation followed by GA or DE selection) was certified against exact ILP solutions on three 52-node topologies, five load factors and twenty randomized replications.
+The hybrid attains the certified optimum of its search space at nominal load, keeps SLA violations near zero in regimes that the exact model proves infeasible for unconstrained routing, and consistently outperforms both greedy baselines and a tabular Q-learning agent under stress. Mapping the optimized paths onto SRv6 segment lists reduces measured forwarding state by up to 4.1× and removes per-flow state from transit switches. At the same time, the constraint structure delivers measurable logical isolation of URLLC-grade flows under background amplification, without any physical network partitioning.
+Taken together, the results establish deterministic, constraint-explicit metaheuristics—augmented by exact certification—as a practical and auditable traffic-engineering core for SDN controllers: exact where exactness is computationally affordable, and heuristic where scale demands it. The approach therefore offers a concrete alternative to purely learning-based routing whenever auditability, feasibility guarantees and predictable QoS isolation are required.

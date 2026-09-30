@@ -1,0 +1,182 @@
+[
+ {
+  "topo": "maia52",
+  "algo": "ilp_opt",
+  "background_mult": 1.0,
+  "urllc_delay_ms": 51.755447795692376,
+  "urllc_jitter_ms": 3.690091705282665,
+  "urllc_loss": 0.0,
+  "urllc_throughput_mbps": 0.5064704
+ },
+ {
+  "topo": "maia52",
+  "algo": "dijkstra",
+  "background_mult": 1.0,
+  "urllc_delay_ms": 265.1249910185855,
+  "urllc_jitter_ms": 2.8260506626521407,
+  "urllc_loss": 0.53125,
+  "urllc_throughput_mbps": 0.2301952
+ },
+ {
+  "topo": "maia52",
+  "algo": "ilp_opt",
+  "background_mult": 1.5,
+  "urllc_delay_ms": 91.02016640867478,
+  "urllc_jitter_ms": 1.306429977611821,
+  "urllc_loss": 0.032852564102564104,
+  "urllc_throughput_mbps": 0.48537600000000003
+ },
+ {
+  "topo": "maia52",
+  "algo": "dijkstra",
+  "background_mult": 1.5,
+  "urllc_delay_ms": 254.64679407039114,
+  "urllc_jitter_ms": 5.658103101356381,
+  "urllc_loss": 0.6766826923076923,
+  "urllc_throughput_mbps": 0.1583104
+ },
+ {
+  "topo": "maia52",
+  "algo": "ilp_opt",
+  "background_mult": 2.0,
+  "urllc_delay_ms": 162.69217482707936,
+  "urllc_jitter_ms": 0.4161814805687882,
+  "urllc_loss": 0.047275641025641024,
+  "urllc_throughput_mbps": 0.4681728
+ },
+ {
+  "topo": "maia52",
+  "algo": "dijkstra",
+  "background_mult": 2.0,
+  "urllc_delay_ms": 211.96578461537655,
+  "urllc_jitter_ms": 8.827589712455241,
+  "urllc_loss": 0.7247596153846154,
+  "urllc_throughput_mbps": 0.130048
+ },
+ {
+  "topo": "maia52",
+  "algo": "ilp_opt",
+  "background_mult": 3.0,
+  "urllc_delay_ms": 233.46304031041186,
+  "urllc_jitter_ms": 1.407552092828517,
+  "urllc_loss": 0.266025641025641,
+  "urllc_throughput_mbps": 0.3540992
+ },
+ {
+  "topo": "maia52",
+  "algo": "dijkstra",
+  "background_mult": 3.0,
+  "urllc_delay_ms": 235.79037918731015,
+  "urllc_jitter_ms": 9.464864618635685,
+  "urllc_loss": 0.7103365384615385,
+  "urllc_throughput_mbps": 0.1368064
+ },
+ {
+  "topo": "maia52",
+  "algo": "ilp_opt",
+  "background_mult": 4.0,
+  "urllc_delay_ms": 239.9736263982913,
+  "urllc_jitter_ms": 0.8282599300836515,
+  "urllc_loss": 0.3112980769230769,
+  "urllc_throughput_mbps": 0.3520512
+ },
+ {
+  "topo": "maia52",
+  "algo": "dijkstra",
+  "background_mult": 4.0,
+  "urllc_delay_ms": 239.23484658635277,
+  "urllc_jitter_ms": 11.343672083434376,
+  "urllc_loss": 0.7892628205128205,
+  "urllc_throughput_mbps": 0.1077248
+ },
+ {
+  "topo": "germany50",
+  "algo": "ilp_opt",
+  "background_mult": 1.0,
+  "urllc_delay_ms": 15.936071191555948,
+  "urllc_jitter_ms": 1.1141255113238395,
+  "urllc_loss": 0.0,
+  "urllc_throughput_mbps": 0.5101568
+ },
+ {
+  "topo": "germany50",
+  "algo": "dijkstra",
+  "background_mult": 1.0,
+  "urllc_delay_ms": 146.60317280408253,
+  "urllc_jitter_ms": 1.4481268949891142,
+  "urllc_loss": 0.14623397435897437,
+  "urllc_throughput_mbps": 0.423936
+ },
+ {
+  "topo": "germany50",
+  "algo": "ilp_opt",
+  "background_mult": 1.5,
+  "urllc_delay_ms": 15.783571426655502,
+  "urllc_jitter_ms": 0.6338823154310655,
+  "urllc_loss": 0.0,
+  "urllc_throughput_mbps": 0.5101568
+ },
+ {
+  "topo": "germany50",
+  "algo": "dijkstra",
+  "background_mult": 1.5,
+  "urllc_delay_ms": 170.12599361958715,
+  "urllc_jitter_ms": 1.3978785951886366,
+  "urllc_loss": 0.375400641025641,
+  "urllc_throughput_mbps": 0.3098624
+ },
+ {
+  "topo": "germany50",
+  "algo": "ilp_opt",
+  "background_mult": 2.0,
+  "urllc_delay_ms": 29.41310631703211,
+  "urllc_jitter_ms": 0.09289897299648633,
+  "urllc_loss": 0.0,
+  "urllc_throughput_mbps": 0.5072896
+ },
+ {
+  "topo": "germany50",
+  "algo": "dijkstra",
+  "background_mult": 2.0,
+  "urllc_delay_ms": 182.43015978272598,
+  "urllc_jitter_ms": 0.7868493272722599,
+  "urllc_loss": 0.028044871794871796,
+  "urllc_throughput_mbps": 0.47615999999999997
+ },
+ {
+  "topo": "germany50",
+  "algo": "ilp_opt",
+  "background_mult": 3.0,
+  "urllc_delay_ms": 72.06795361757189,
+  "urllc_jitter_ms": 1.1255363974235972,
+  "urllc_loss": 0.13020833333333334,
+  "urllc_throughput_mbps": 0.4386816
+ },
+ {
+  "topo": "germany50",
+  "algo": "dijkstra",
+  "background_mult": 3.0,
+  "urllc_delay_ms": 175.03981430206954,
+  "urllc_jitter_ms": 1.3453604699047172,
+  "urllc_loss": 0.04447115384615385,
+  "urllc_throughput_mbps": 0.4681728
+ },
+ {
+  "topo": "germany50",
+  "algo": "ilp_opt",
+  "background_mult": 4.0,
+  "urllc_delay_ms": 131.23393397759787,
+  "urllc_jitter_ms": 1.3874181020533671,
+  "urllc_loss": 0.1314102564102564,
+  "urllc_throughput_mbps": 0.4349952
+ },
+ {
+  "topo": "germany50",
+  "algo": "dijkstra",
+  "background_mult": 4.0,
+  "urllc_delay_ms": 157.6028816168244,
+  "urllc_jitter_ms": 0.7357160138078083,
+  "urllc_loss": 0.044070512820512824,
+  "urllc_throughput_mbps": 0.4726784
+ }
+]

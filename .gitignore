@@ -1,0 +1,25 @@
+# Python virtualenv & packages
+pylib/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# TeX runtime distribution
+tex/
+*.aux
+*.log
+*.blg
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+paper/pt1.log
+paper/pt2.log
+
+# Temporary and local scratch
+.tmp/
+tmp/
+*.tmp
+.DS_Store
